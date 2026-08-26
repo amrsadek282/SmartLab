@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Laboratory Report — {{ e($reportNumber) }}</title>
     <style>
-        @page {
+        @@page {
             size: a4 portrait;
             margin: 18mm 18mm 18mm 18mm;
         }
@@ -14,6 +14,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'DejaVu Sans', sans-serif;
         }
 
         body {
