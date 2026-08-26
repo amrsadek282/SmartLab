@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Services\EgyptianPhoneNormalizer;
+use App\Services\WhatsAppReportService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,9 +20,20 @@ class Order extends Model
         'patient_id',
         'appointment_id',
         'status',
+        'sample_status',
+        'sample_collected_at',
+        'sample_received_at',
         'notes',
         'created_by',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'sample_collected_at' => 'datetime',
+            'sample_received_at' => 'datetime',
+        ];
+    }
 
     public function patient(): BelongsTo
     {
@@ -67,32 +80,82 @@ class Order extends Model
         return $query->where('status', 'completed');
     }
 
+    public function scopeCancelled(Builder $query): Builder
+    {
+        return $query->where('status', 'cancelled');
+    }
+
+    public function scopeSamplePending(Builder $query): Builder
+    {
+        return $query->where('sample_status', 'pending_collection');
+    }
+
+    public function scopeSampleCollected(Builder $query): Builder
+    {
+        return $query->where('sample_status', 'collected');
+    }
+
+    public function scopeSampleReceived(Builder $query): Builder
+    {
+        return $query->where('sample_status', 'received_in_lab');
+    }
+
+    /**
+     * Check if all ordered test items have entered results.
+     */
+    public function isResultsComplete(): bool
+    {
+        if ($this->orderItems->isEmpty()) {
+            return false;
+        }
+
+        foreach ($this->orderItems as $item) {
+            if (! $item->result || empty($item->result->result_text)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the report is ready for viewing/sharing.
+     */
+    public function isReportReady(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    /**
+     * Check if the associated patient has a valid WhatsApp-compatible phone number.
+     */
+    public function hasValidWhatsappPhone(): bool
+    {
+        return EgyptianPhoneNormalizer::isValidEgyptianMobile($this->patient?->phone)
+            || ! empty(EgyptianPhoneNormalizer::normalize($this->patient?->phone));
+    }
+
+    /**
+     * Get normalized phone number string for WhatsApp.
+     */
+    public function getNormalizedPatientPhone(): ?string
+    {
+        return EgyptianPhoneNormalizer::normalize($this->patient?->phone);
+    }
+
+    /**
+     * Get formatted display string for patient's phone number.
+     */
+    public function getFormattedPatientPhone(): string
+    {
+        return EgyptianPhoneNormalizer::formatDisplay($this->patient?->phone);
+    }
+
     /**
      * Get formatted WhatsApp click-to-chat URL for patient.
      */
-    public function getWhatsappUrlAttribute(): string
+    public function getWhatsappUrlAttribute(): ?string
     {
-        $phone = $this->patient?->phone ?? '';
-        $digits = preg_replace('/\D/', '', $phone);
-
-        if (str_starts_with($digits, '0020')) {
-            $digits = substr($digits, 2);
-        } elseif (str_starts_with($digits, '0')) {
-            $digits = '2'.$digits;
-        }
-
-        $reportUrl = route('reports.download', $this);
-        $patientName = $this->patient?->name ?? 'Patient';
-
-        $message = "مرحباً {$patientName}،\n"
-            ."تقرير التحاليل الطبية الخاص بك للطلب رقم {$this->order_number} جاهز الآن.\n"
-            ."يمكنك تحميل التقرير عبر الرابط التالي:\n{$reportUrl}\n\n"
-            ."شكراً لاختياركم معملنا!\n\n"
-            ."Hello {$patientName},\n"
-            ."Your laboratory test report for Order {$this->order_number} is ready.\n"
-            ."Download report: {$reportUrl}\n\n"
-            .'Thank you for choosing Mini LIS Laboratory!';
-
-        return 'https://wa.me/'.$digits.'?text='.urlencode($message);
+        return WhatsAppReportService::generateClickToChatUrl($this);
     }
 }

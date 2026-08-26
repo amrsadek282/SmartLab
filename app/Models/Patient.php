@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\EgyptianPhoneNormalizer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,5 +35,20 @@ class Patient extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function getNormalizedPhoneAttribute(): ?string
+    {
+        return EgyptianPhoneNormalizer::normalize($this->phone);
+    }
+
+    public function getFormattedPhoneAttribute(): string
+    {
+        return EgyptianPhoneNormalizer::formatDisplay($this->phone);
+    }
+
+    public function getOperatorNameAttribute(): ?string
+    {
+        return EgyptianPhoneNormalizer::getOperator($this->phone);
     }
 }

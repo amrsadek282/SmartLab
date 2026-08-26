@@ -1,18 +1,18 @@
 @auth
     <div class="flex items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-sm flex items-center justify-center shrink-0 ring-2 ring-slate-800 shadow-sm">
+        <a href="{{ route('profile.show') }}" class="flex items-center gap-2.5 min-w-0 group" title="View & Edit Profile">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 group-hover:from-blue-500 group-hover:to-indigo-500 text-white font-bold text-sm flex items-center justify-center shrink-0 ring-2 ring-slate-800 shadow-sm transition-all">
                 {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
             </div>
             <div class="min-w-0 flex-1">
-                <p class="text-xs font-semibold text-white truncate">{{ auth()->user()->name }}</p>
+                <p class="text-xs font-semibold text-white group-hover:text-blue-300 transition-colors truncate">{{ auth()->user()->name }}</p>
                 <div class="mt-0.5">
                     <x-badge :role="auth()->user()->role" size="sm">
                         {{ auth()->user()->role }}
                     </x-badge>
                 </div>
             </div>
-        </div>
+        </a>
 
         <form method="POST" action="{{ route('logout') }}" class="shrink-0">
             @csrf

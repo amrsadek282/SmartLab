@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'password',
         'role',
         'phone',
+        'is_active',
     ];
 
     /**
@@ -46,6 +48,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -62,6 +65,28 @@ class User extends Authenticatable
     public function isTechnician(): bool
     {
         return $this->role === 'technician';
+    }
+
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeInactive(Builder $query): Builder
+    {
+        return $query->where('is_active', false);
+    }
+
+    public function hasAssociatedRecords(): bool
+    {
+        return $this->createdOrders()->exists()
+            || $this->enteredResults()->exists()
+            || $this->generatedReports()->exists();
     }
 
     public function createdOrders(): HasMany

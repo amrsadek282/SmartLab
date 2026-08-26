@@ -24,7 +24,7 @@
             <p class="text-xs sm:text-sm text-slate-500 flex items-center gap-2">
                 <span>{{ now()->format('l, F j, Y') }}</span>
                 <span class="inline-block w-1 h-1 rounded-full bg-slate-300"></span>
-                <span>Mini LIS Laboratory Control Center</span>
+                <span>SmartLab — Diagnostic Control Center</span>
             </p>
         </div>
 
@@ -261,7 +261,7 @@
                     <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
                     </svg>
-                    Mini LIS Core Operational Workflow
+                    SmartLab Core Operational Workflow
                 </h3>
                 <p class="text-xs text-slate-500 mt-1">End-to-end sample processing lifecycle</p>
 

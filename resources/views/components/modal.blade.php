@@ -27,21 +27,21 @@
     aria-labelledby="{{ $id }}-title"
 >
     <div
-        class="relative w-full {{ $sizeClass }} bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all duration-200 scale-95 opacity-0 modal-content my-8 mx-auto"
+        class="relative w-full {{ $sizeClass }} bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all duration-200 scale-95 opacity-0 modal-content my-8 mx-auto"
         onclick="event.stopPropagation()"
     >
         @if ($title)
-            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/40">
                 <div>
-                    <h3 id="{{ $id }}-title" class="text-base font-semibold text-slate-800">{{ $title }}</h3>
+                    <h3 id="{{ $id }}-title" class="text-base font-semibold text-slate-800 dark:text-white">{{ $title }}</h3>
                     @if ($subtitle)
-                        <p class="text-xs text-slate-500 mt-0.5">{{ $subtitle }}</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $subtitle }}</p>
                     @endif
                 </div>
                 <button
                     type="button"
                     onclick="window.closeModal('{{ $id }}')"
-                    class="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1.5 rounded-lg transition-colors cursor-pointer"
+                    class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 p-1.5 rounded-lg transition-colors cursor-pointer"
                     aria-label="Close modal"
                 >
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -51,12 +51,12 @@
             </div>
         @endif
 
-        <div class="p-6 text-sm text-slate-700">
+        <div class="p-6 text-sm text-slate-700 dark:text-slate-300">
             {{ $slot }}
         </div>
 
         @if ($footer)
-            <div class="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-3">
+            <div class="px-6 py-4 bg-slate-50/80 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
                 {{ $footer }}
             </div>
         @endif

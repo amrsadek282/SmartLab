@@ -197,4 +197,58 @@ class OrderController extends Controller
             ->back()
             ->with('success', "Order {$order->order_number} status updated to '{$validated['status']}'.");
     }
+
+    /**
+     * Update sample collection & lab receipt tracking status.
+     */
+    public function updateSampleStatus(Request $request, Order $order): RedirectResponse
+    {
+        $validated = $request->validate([
+            'sample_status' => ['required', 'in:pending_collection,collected,received_in_lab'],
+        ]);
+
+        $status = $validated['sample_status'];
+        $updates = ['sample_status' => $status];
+
+        if ($status === 'collected') {
+            $updates['sample_collected_at'] = $order->sample_collected_at ?? now();
+        } elseif ($status === 'received_in_lab') {
+            $updates['sample_collected_at'] = $order->sample_collected_at ?? now();
+            $updates['sample_received_at'] = $order->sample_received_at ?? now();
+        } elseif ($status === 'pending_collection') {
+            $updates['sample_collected_at'] = null;
+            $updates['sample_received_at'] = null;
+        }
+
+        $order->update($updates);
+
+        $statusLabels = [
+            'pending_collection' => 'Pending Collection',
+            'collected' => 'Sample Collected',
+            'received_in_lab' => 'Received in Lab',
+        ];
+
+        return redirect()
+            ->back()
+            ->with('success', "Sample status updated to '{$statusLabels[$status]}'.");
+    }
+
+    /**
+     * Quick inline update of patient phone number directly from the order page.
+     */
+    public function updatePatientPhone(Request $request, Order $order): RedirectResponse
+    {
+        $validated = $request->validate([
+            'phone' => ['required', 'string', 'min:8', 'max:25'],
+        ]);
+
+        $patient = $order->patient;
+        $patient->update([
+            'phone' => $validated['phone'],
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('success', "Patient phone number updated to '{$patient->phone}' successfully.");
+    }
 }

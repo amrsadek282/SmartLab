@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Report;
+use App\Services\EgyptianPhoneNormalizer;
+use App\Services\WhatsAppReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class ReportController extends Controller
@@ -76,7 +79,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Build WhatsApp sharing link for the patient and redirect.
+     * Build WhatsApp sharing link for the patient, track delivery initiation, and redirect.
      *
      * Route: GET /reports/{order}/whatsapp   →   reports.whatsapp
      */
@@ -84,7 +87,46 @@ class ReportController extends Controller
     {
         $this->ensureResultsReady($order);
 
-        return redirect()->away($order->whatsapp_url);
+        $order->load(['patient', 'report']);
+
+        $patientPhone = $order->patient?->phone;
+        $normalizedPhone = EgyptianPhoneNormalizer::normalize($patientPhone);
+
+        if (! $normalizedPhone) {
+            return redirect()
+                ->back()
+                ->with('error', 'Patient does not have a valid phone number for WhatsApp delivery. Please update the phone number.');
+        }
+
+        // Ensure PDF & report record exist with share token before sending link
+        if (! $order->report) {
+            $order->load([
+                'orderItems.test',
+                'orderItems.result.technician',
+            ]);
+            [$pdf, $reportNumber] = $this->buildPdf($order);
+            $this->persistReport($order, $reportNumber, $pdf->output());
+            $order->refresh();
+        }
+
+        // Track that WhatsApp link has been opened
+        if ($order->report) {
+            $order->report->update([
+                'whatsapp_opened_at' => now(),
+                'whatsapp_opened_by' => auth()->id(),
+                'whatsapp_open_count' => ($order->report->whatsapp_open_count ?? 0) + 1,
+            ]);
+        }
+
+        $whatsappUrl = WhatsAppReportService::generateClickToChatUrl($order);
+
+        if (! $whatsappUrl) {
+            return redirect()
+                ->back()
+                ->with('error', 'Unable to generate WhatsApp link for this patient.');
+        }
+
+        return redirect()->away($whatsappUrl);
     }
 
     // -------------------------------------------------------------------------
@@ -126,11 +168,15 @@ class ReportController extends Controller
         $path = "reports/{$reportNumber}.pdf";
         Storage::disk('public')->put($path, $pdfContent);
 
+        $existing = $order->report;
+        $shareToken = $existing?->share_token ?? Str::random(48);
+
         Report::updateOrCreate(
             ['order_id' => $order->id],
             [
                 'report_number' => $reportNumber,
                 'pdf_path' => $path,
+                'share_token' => $shareToken,
                 'generated_by' => auth()->id() ?? $order->created_by,
                 'generated_at' => now(),
             ]

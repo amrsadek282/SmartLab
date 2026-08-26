@@ -15,15 +15,15 @@
     $hasError = $name && $errors->has($name);
     $inputValue = $value ?? ($name ? old($name) : null);
 
-    $inputClasses = 'w-full px-3.5 py-2.5 text-sm bg-white text-slate-900 rounded-xl border transition-colors duration-150 outline-none focus:ring-2 disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed ' .
+    $inputClasses = 'w-full px-3.5 py-2.5 text-sm bg-white dark:bg-slate-950 text-slate-900 dark:text-white rounded-xl border transition-colors duration-150 outline-none focus:ring-2 disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:text-slate-500 disabled:cursor-not-allowed ' .
         ($hasError
-            ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 text-red-900 placeholder-red-300'
-            : 'border-slate-300 focus:border-blue-500 focus:ring-blue-500/20 placeholder-slate-400');
+            ? 'border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/20 text-red-900 dark:text-red-300 placeholder-red-300 dark:placeholder-red-700'
+            : 'border-slate-300 dark:border-slate-800 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500/20 placeholder-slate-400 dark:placeholder-slate-500');
 @endphp
 
 <div class="space-y-1.5">
     @if ($label)
-        <label for="{{ $inputId }}" class="block text-sm font-medium text-slate-700">
+        <label for="{{ $inputId }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
             {{ $label }}
             @if ($required)
                 <span class="text-red-500 ml-0.5">*</span>
@@ -53,8 +53,8 @@
     </div>
 
     @if ($hasError)
-        <p class="text-xs text-red-600 mt-1 font-medium">{{ $errors->first($name) }}</p>
+        <p class="text-xs text-red-600 dark:text-red-400 mt-1 font-medium">{{ $errors->first($name) }}</p>
     @elseif ($hint)
-        <p class="text-xs text-slate-500 mt-1">{{ $hint }}</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ $hint }}</p>
     @endif
 </div>
