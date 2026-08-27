@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Laboratory Report — {{ e($reportNumber) }}</title>
+    <title>Laboratory Report &mdash; {{ e($reportNumber) }}</title>
     <style>
         @@page {
             size: a4 portrait;
@@ -14,11 +14,11 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: 'Helvetica', Arial, sans-serif;
         }
 
         body {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: 'Helvetica', Arial, sans-serif;
             font-size: 9pt;
             color: #222222;
             background-color: #ffffff;
@@ -26,17 +26,17 @@
         }
 
         table {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: 'Helvetica', Arial, sans-serif;
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
         }
 
         td, th {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: 'Helvetica', Arial, sans-serif;
         }
 
-        /* ── Header: lab name top-left, meta top-right ── */
+        /* -- Header: lab name top-left, meta top-right -- */
         .header-table {
             margin-bottom: 10pt;
         }
@@ -71,14 +71,14 @@
             padding-bottom: 1pt;
         }
 
-        /* ── Horizontal divider below header ── */
+        /* -- Horizontal divider below header -- */
         .header-rule {
             border: none;
             border-top: 1pt solid #cccccc;
             margin-bottom: 10pt;
         }
 
-        /* ── Patient info card: light blue bg, left blue border ── */
+        /* -- Patient info card: light blue bg, left blue border -- */
         .patient-card {
             background-color: #e8eef8;
             border-left: 3pt solid #1a4a8a;
@@ -102,7 +102,7 @@
             width: 35%;
         }
 
-        /* ── "LABORATORY TEST RESULTS" heading ── */
+        /* -- "LABORATORY TEST RESULTS" heading -- */
         .results-heading {
             font-size: 8.5pt;
             font-weight: bold;
@@ -114,7 +114,7 @@
             margin-bottom: 8pt;
         }
 
-        /* ── Results table ── */
+        /* -- Results table -- */
         .results-table {
             border: 1pt solid #cccccc;
             margin-bottom: 12pt;
@@ -171,7 +171,7 @@
             font-size: 8pt;
         }
 
-        /* ── Signatures ── */
+        /* -- Signatures -- */
         .sig-section {
             margin-top: 22pt;
             margin-bottom: 6pt;
@@ -192,7 +192,7 @@
             display: block;
         }
 
-        /* ── Footer ── */
+        /* -- Footer -- */
         .footer-note {
             margin-top: 14pt;
             font-size: 7pt;
@@ -242,15 +242,15 @@
 <table class="patient-card">
     <tr>
         <td class="lbl">Patient:</td>
-        <td class="val">{{ e($order->patient->name ?? '—') }}</td>
+        <td class="val">{{ e($order->patient->name ?? '-') }}</td>
         <td class="lbl">Age:</td>
-        <td class="val">{{ e($order->patient->age ?? '—') }} years</td>
+        <td class="val">{{ e($order->patient->age ?? '-') }} years</td>
     </tr>
     <tr>
         <td class="lbl">Gender:</td>
-        <td class="val">{{ e(ucfirst($order->patient->gender ?? '—')) }}</td>
+        <td class="val">{{ e(ucfirst($order->patient->gender ?? '-')) }}</td>
         <td class="lbl">Phone:</td>
-        <td class="val">{{ e($order->patient->phone ?? '—') }}</td>
+        <td class="val">{{ e($order->patient->phone ?? '-') }}</td>
     </tr>
 </table>
 
@@ -267,7 +267,7 @@
     @foreach($order->orderItems as $item)
         @php
             $category   = $item->test->category ?? null;
-            $resultText = trim($item->result?->result_text ?? '—');
+            $resultText = trim($item->result?->result_text ?? '-');
             $unit       = $item->test->unit ?? '';
             $refRange   = $item->result?->reference_range ?? $item->test->reference_range ?? '';
             $notes      = $item->result?->notes ?? '';
@@ -330,7 +330,7 @@
 {{-- 5. FOOTER                                                          --}}
 {{-- ================================================================ --}}
 <div class="footer-note">
-    This report is generated electronically and is valid without a physical signature. — SmartLab Laboratory — {{ e($reportDate) }}
+    This report is generated electronically and is valid without a physical signature. &mdash; SmartLab Laboratory &mdash; {{ e($reportDate) }}
 </div>
 
 </body>
